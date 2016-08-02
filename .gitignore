@@ -3,6 +3,9 @@
 ### Programmers ###
 TODO.txt
 
+### Arduino ###
+.build_ano
+
 ### OSX ###
 *.DS_Store
 .AppleDouble
