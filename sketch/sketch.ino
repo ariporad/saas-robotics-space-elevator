@@ -1,7 +1,7 @@
 #include <Servo.h>
 
-#define LEFT_SERVO_PIN 3
-#define RIGHT_SERVO_PIN 5
+#define LEFT_SERVO_PIN 5
+#define RIGHT_SERVO_PIN 6
 
 // D8 is a poor-man's start button. It's a jumper wire with a string attached. When this string is
 // pulled, the wire disconnects, and the robot starts.
