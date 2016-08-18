@@ -1,19 +1,22 @@
-  /*
+/*
   Space Elevator Code 
 
   for 5V Adafruit Trinket
 
-  Momentary Switch wired to Pin 0
+  Two Momentary Switches (top and bottom of robot) wired to Pin 0
   Continuous Servo wired to Pin 1
+  Jumper wired to Pin 2 (used to start the robot)
 
 */
  
- #include <Adafruit_SoftServo.h>  // SoftwareServo (works on non PWM pins)
+#include <Adafruit_SoftServo.h>  // SoftwareServo (works on non PWM pins)
 
-#define SERVO1PIN 1   // Servo control line (white) on Trinket Pin #1
- 
-int top_button = 0;   //momentary switch wired to Trinket Pin #0
+#define SERVOPIN 1   // Servo control line (white) on Trinket Pin #1
+#define STARTPIN 2    // Jumper attached to Trinket Pin #2 
+#define TOPBUTTON 0  // Momentary switch wired to Trinket Pin #0
+
 int pressed_counter = 0;  // button hasn't been pressed
+unsigned long lastTimePressed = 0;
  
 Adafruit_SoftServo drive;  //create a servo object
  
@@ -25,23 +28,35 @@ void setup()
   TIMSK |= _BV(OCIE0A);    // Turn on the compare interrupt (below!)
 
   //setup servo
-  drive.attach(SERVO1PIN);   // Attach the servo to pin 1 on Trinket
+  drive.attach(SERVOPIN);   // Attach the servo to pin 1 on Trinket
   drive.write(90);           // Tell servo to go to position per quirk
   delay(15);                    // Wait 15ms for the servo to reach the position
   
   // setup momentary switched, pulled up to 5V (digital 1) by default
-  pinMode(top_button, INPUT_PULLUP);
+  pinMode(TOPBUTTON, INPUT_PULLUP);
+  
+  // setup start switched, pulled up to 5V.  normally will be shorted, but 
+  // will go high to start program
+  pinMode(STARTPIN, INPUT_PULLUP);
 }
  
 // the loop routine runs over and over again forever:
 void loop() 
 {
-  // look for pressed button which pulls input low
-  if(digitalRead(top_button) == 0)
+  // do nothing till startpin goes high
+  if(digitalRead(STARTPIN) == 0)
+  {
+    return;
+  }
+
+  // look for pressed button which pulls input low AND that at least 1 second has passed since
+  // the last time the button was pressed
+  unsigned long timeSinceLastPressed = millis() - lastTimePressed;
+  if(digitalRead(TOPBUTTON) == 0 && timeSinceLastPressed > 1000)
   {
       //increment a counter with a 250ms debounce
       ++pressed_counter;
-      delay(250);
+      lastTimePressed = millis();
   } 
   
   // is the number of presses odd?
